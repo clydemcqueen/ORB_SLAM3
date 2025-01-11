@@ -23,8 +23,8 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/features2d/features2d.hpp>
 
-#include "Viewer.h"
-#include "FrameDrawer.h"
+// #include "Viewer.h"
+// #include "FrameDrawer.h"
 #include "Atlas.h"
 #include "LocalMapping.h"
 #include "LoopClosing.h"
@@ -32,7 +32,7 @@
 #include "ORBVocabulary.h"
 #include "KeyFrameDatabase.h"
 #include "ORBextractor.h"
-#include "MapDrawer.h"
+// #include "MapDrawer.h"
 #include "System.h"
 #include "ImuTypes.h"
 #include "Settings.h"
@@ -52,6 +52,8 @@ class LocalMapping;
 class LoopClosing;
 class System;
 class Settings;
+
+class MapDrawer;
 
 class Tracking
 {  
