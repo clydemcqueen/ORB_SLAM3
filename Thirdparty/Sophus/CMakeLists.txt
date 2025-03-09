@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.4)
+cmake_minimum_required(VERSION 3.5)
 project(Sophus VERSION 1.1.0)
 
 include(CMakePackageConfigHelpers)
@@ -9,6 +9,8 @@ include(GNUInstallDirs)
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)
 endif()
+
+message(STATUS "${PROJECT_NAME} build type: " ${CMAKE_BUILD_TYPE})
 
 set(CMAKE_CXX_STANDARD 11)
 

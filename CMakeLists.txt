@@ -1,7 +1,11 @@
 cmake_minimum_required(VERSION 3.12)
 project(ORB_SLAM3)
 
-message("Build type: " ${CMAKE_BUILD_TYPE})
+message(STATUS "${PROJECT_NAME} build type: " ${CMAKE_BUILD_TYPE})
+
+add_subdirectory(Thirdparty/Sophus)
+add_subdirectory(Thirdparty/DBoW2)
+add_subdirectory(Thirdparty/g2o)
 
 if(NOT CMAKE_C_STANDARD)
   set(CMAKE_C_STANDARD 99)
@@ -11,7 +15,18 @@ if(NOT CMAKE_CXX_STANDARD)
   set(CMAKE_CXX_STANDARD 14)
 endif()
 
-# Disable warnings for now
+find_package(OpenCV 4.4)
+if(NOT OpenCV_FOUND)
+  message(FATAL_ERROR "OpenCV > 4.4 not found.")
+endif()
+
+message(STATUS "OpenCV version: " ${OpenCV_VERSION})
+
+find_package(Eigen3 3.1.0 REQUIRED)
+
+# Disable some warnings for now
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-parameter")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-copy")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-variable")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-reorder")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations")
@@ -24,101 +39,62 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-conversion-null")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-dangling-else")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-local-typedefs")
 
-set(CMAKE_BUILD_PARALLEL_LEVEL 20)
+add_library(${PROJECT_NAME} SHARED)
 
-#LIST(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake_modules)
-
-find_package(OpenCV 4.4)
-   if(NOT OpenCV_FOUND)
-      message(FATAL_ERROR "OpenCV > 4.4 not found.")
-   endif()
-
-MESSAGE("OPENCV VERSION:")
-MESSAGE(${OpenCV_VERSION})
-
-find_package(Eigen3 3.1.0 REQUIRED)
-#find_package(Pangolin REQUIRED)
-#find_package(realsense2)
-
-include_directories(
-${PROJECT_SOURCE_DIR}
-${PROJECT_SOURCE_DIR}/include
-${PROJECT_SOURCE_DIR}/include/CameraModels
-${PROJECT_SOURCE_DIR}/Thirdparty/Sophus
-${EIGEN3_INCLUDE_DIR}
-#${Pangolin_INCLUDE_DIRS}
+target_sources(${PROJECT_NAME}
+  PRIVATE
+  src/System.cc
+  src/Tracking.cc
+  src/LocalMapping.cc
+  src/LoopClosing.cc
+  src/ORBextractor.cc
+  src/ORBmatcher.cc
+  src/Converter.cc
+  src/MapPoint.cc
+  src/KeyFrame.cc
+  src/Atlas.cc
+  src/Map.cc
+  src/Optimizer.cc
+  src/Frame.cc
+  src/KeyFrameDatabase.cc
+  src/Sim3Solver.cc
+  src/ImuTypes.cc
+  src/G2oTypes.cc
+  src/CameraModels/Pinhole.cpp
+  src/CameraModels/KannalaBrandt8.cpp
+  src/OptimizableTypes.cpp
+  src/MLPnPsolver.cpp
+  src/GeometricTools.cc
+  src/TwoViewReconstruction.cc
+  src/Config.cc
+  src/Settings.cc
 )
 
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
+# Specify include directories, be careful about build vs install
+target_include_directories(${PROJECT_NAME}
+  PUBLIC
+  # For build:
+  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>  # Handles includes of the form: "Thirdparty/..."
+  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include/CameraModels>
+  $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/Thirdparty/Sophus>
 
-add_library(${PROJECT_NAME} SHARED
-src/System.cc
-src/Tracking.cc
-src/LocalMapping.cc
-src/LoopClosing.cc
-src/ORBextractor.cc
-src/ORBmatcher.cc
-#src/FrameDrawer.cc
-src/Converter.cc
-src/MapPoint.cc
-src/KeyFrame.cc
-src/Atlas.cc
-src/Map.cc
-#src/MapDrawer.cc
-src/Optimizer.cc
-src/Frame.cc
-src/KeyFrameDatabase.cc
-src/Sim3Solver.cc
-#src/Viewer.cc
-src/ImuTypes.cc
-src/G2oTypes.cc
-src/CameraModels/Pinhole.cpp
-src/CameraModels/KannalaBrandt8.cpp
-src/OptimizableTypes.cpp
-src/MLPnPsolver.cpp
-src/GeometricTools.cc
-src/TwoViewReconstruction.cc
-src/Config.cc
-src/Settings.cc
-include/System.h
-include/Tracking.h
-include/LocalMapping.h
-include/LoopClosing.h
-include/ORBextractor.h
-include/ORBmatcher.h
-#include/FrameDrawer.h
-include/Converter.h
-include/MapPoint.h
-include/KeyFrame.h
-include/Atlas.h
-include/Map.h
-#include/MapDrawer.h
-include/Optimizer.h
-include/Frame.h
-include/KeyFrameDatabase.h
-include/Sim3Solver.h
-#include/Viewer.h
-include/ImuTypes.h
-include/G2oTypes.h
-include/CameraModels/GeometricCamera.h
-include/CameraModels/Pinhole.h
-include/CameraModels/KannalaBrandt8.h
-include/OptimizableTypes.h
-include/MLPnPsolver.h
-include/GeometricTools.h
-include/TwoViewReconstruction.h
-include/SerializationUtils.h
-include/Config.h
-include/Settings.h)
+  # For install:
+  $<INSTALL_INTERFACE:.>
+  $<INSTALL_INTERFACE:include>
+  $<INSTALL_INTERFACE:include/CameraModels>
+  $<INSTALL_INTERFACE:Thirdparty/Sophus>
 
-add_subdirectory(Thirdparty/g2o)
+  PRIVATE
+  ${EIGEN3_INCLUDE_DIR}
+)
 
 target_link_libraries(${PROJECT_NAME}
-${OpenCV_LIBS}
-${EIGEN3_LIBS}
-#${Pangolin_LIBRARIES}
-${PROJECT_SOURCE_DIR}/Thirdparty/DBoW2/lib/libDBoW2.so
-${PROJECT_SOURCE_DIR}/Thirdparty/g2o/lib/libg2o.so
--lboost_serialization
--lcrypto
+  PRIVATE
+  ${OpenCV_LIBS}
+  ${EIGEN3_LIBS}
+  DBoW2
+  g2o
+  -lboost_serialization
+  -lcrypto
 )
