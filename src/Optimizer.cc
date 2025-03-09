@@ -60,6 +60,28 @@ void Optimizer::GlobalBundleAdjustemnt(Map* pMap, int nIterations, bool* pbStopF
 void Optimizer::BundleAdjustment(const vector<KeyFrame *> &vpKFs, const vector<MapPoint *> &vpMP,
                                  int nIterations, bool* pbStopFlag, const unsigned long nLoopKF, const bool bRobust)
 {
+    if (vpKFs.empty() || vpMP.empty()) {
+        std::cerr << "Error: Bundle Adjustment called with empty data!" << std::endl;
+        return;
+    }
+
+    std::cout << "vpKFs: " << vpKFs.size() << std::endl;
+    std::cout << "vpMP: " << vpMP.size() << std::endl;
+
+    for (const auto pKF : vpKFs) {
+        if (!pKF || pKF->isBad()) {
+            std::cerr << "Error: Invalid KeyFrame encountered!" << std::endl;
+            return;  // Or handle it appropriately
+        }
+    }
+
+    for (const auto pMP : vpMP) {
+        if (!pMP || pMP->isBad()) {
+            std::cerr << "Error: Invalid MapPoint encountered!" << std::endl;
+            return;  // Or handle it appropriately
+        }
+    }
+
     vector<bool> vbNotIncludedMP;
     vbNotIncludedMP.resize(vpMP.size());
 
@@ -387,6 +409,12 @@ void Optimizer::BundleAdjustment(const vector<KeyFrame *> &vpKFs, const vector<M
             pMP->mnBAGlobalForKF = nLoopKF;
         }
     }
+
+    std::cout << "BA: End of the optimization, start clearing" << std::endl;
+    std::flush(std::cout);
+    optimizer.clear();
+    std::cout << "Clear successful" << std::endl;
+    std::flush(std::cout);
 }
 
 void Optimizer::FullInertialBA(Map *pMap, int its, const bool bFixLocal, const long unsigned int nLoopId, bool *pbStopFlag, bool bInit, float priorG, float priorA, Eigen::VectorXd *vSingVal, bool *bHess)
