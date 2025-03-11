@@ -75,7 +75,7 @@ class ImuCamPose
 {
 public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-    ImuCamPose(){}
+    ImuCamPose(): bf(0), its(0) {}
     ImuCamPose(KeyFrame* pKF);
     ImuCamPose(Frame* pF);
     ImuCamPose(Eigen::Matrix3d &_Rwc, Eigen::Vector3d &_twc, KeyFrame* pKF);
@@ -113,7 +113,7 @@ class InvDepthPoint
 {
 public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-    InvDepthPoint(){}
+    InvDepthPoint(): rho(0), u(0), v(0), fx(0), fy(0), cx(0), cy(0), bf(0), its(0) {}
     InvDepthPoint(double _rho, double _u, double _v, KeyFrame* pHostKF);
 
     void Update(const double *pu);
@@ -268,7 +268,7 @@ public:
 
     Eigen::Matrix3d Rwg, Rgw;
 
-    int its;
+    int its{};
 };
 
 class VertexGDir : public g2o::BaseVertex<2,GDirection>

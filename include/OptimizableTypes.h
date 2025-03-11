@@ -53,7 +53,7 @@ public:
     virtual void linearizeOplus();
 
     Eigen::Vector3d Xw;
-    GeometricCamera* pCamera;
+    GeometricCamera* pCamera{};
 };
 
 class  EdgeSE3ProjectXYZOnlyPoseToBody: public  g2o::BaseUnaryEdge<2, Eigen::Vector2d, g2o::VertexSE3Expmap>{
@@ -81,7 +81,7 @@ public:
     virtual void linearizeOplus();
 
     Eigen::Vector3d Xw;
-    GeometricCamera* pCamera;
+    GeometricCamera* pCamera{};
 
     g2o::SE3Quat mTrl;
 };

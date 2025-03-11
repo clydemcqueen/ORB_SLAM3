@@ -100,9 +100,9 @@ namespace ORB_SLAM3 {
     protected:
         std::vector<float> mvParameters;
 
-        unsigned int mnId;
+        unsigned int mnId{};
 
-        unsigned int mnType;
+        unsigned int mnType{};
     };
 }
 
