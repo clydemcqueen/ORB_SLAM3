@@ -1,5 +1,13 @@
 # ORB-SLAM3
 
+### Changes for Ubuntu 22.04, March 24th, 2025
+
+* Minimum CMake is 3.10
+* Does not depend on realsense2
+* Suppress some warnings
+* Simplify the build process
+* Fix a crashing bug by initializing all member variables in constructors
+
 ### V1.0, December 22th, 2021
 **Authors:** Carlos Campos, Richard Elvira, Juan J. Gómez Rodríguez, [José M. M. Montiel](http://webdiis.unizar.es/~josemari/), [Juan D. Tardos](http://webdiis.unizar.es/~jdtardos/).
 
