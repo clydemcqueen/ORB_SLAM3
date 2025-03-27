@@ -99,14 +99,14 @@ public:
     std::vector<Eigen::Vector3d> tcw;
     std::vector<Eigen::Matrix3d> Rcb, Rbc;
     std::vector<Eigen::Vector3d> tcb, tbc;
-    double bf;
+    double bf{};
     std::vector<GeometricCamera*> pCamera;
 
     // For posegraph 4DoF
     Eigen::Matrix3d Rwb0;
     Eigen::Matrix3d DR;
 
-    int its;
+    int its{};
 };
 
 class InvDepthPoint
@@ -118,12 +118,12 @@ public:
 
     void Update(const double *pu);
 
-    double rho;
-    double u, v; // they are not variables, observation in the host frame
+    double rho{};
+    double u{}, v{}; // they are not variables, observation in the host frame
 
-    double fx, fy, cx, cy, bf; // from host frame
+    double fx{}, fy{}, cx{}, cy{}, bf{}; // from host frame
 
-    int its;
+    int its{};
 };
 
 // Optimizable parameters are IMU pose

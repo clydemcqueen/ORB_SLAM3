@@ -92,7 +92,7 @@ namespace ORB_SLAM3 {
     private:
         //Parameters vector corresponds to
         //      [fx, fy, cx, cy]
-        TwoViewReconstruction* tvr;
+        TwoViewReconstruction* tvr{};
     };
 }
 

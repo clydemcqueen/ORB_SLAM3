@@ -122,7 +122,7 @@ public:
     Sophus::SE3<float> mTcb;
     Sophus::SE3<float> mTbc;
     Eigen::DiagonalMatrix<float,6> Cov, CovWalk;
-    bool mbIsSet;
+    bool mbIsSet{};
 };
 
 //Integration of 1 gyro measurement
@@ -133,7 +133,7 @@ public:
     IntegratedRotation(const Eigen::Vector3f &angVel, const Bias &imuBias, const float &time);
 
 public:
-    float deltaT; //integration time
+    float deltaT{}; //integration time
     Eigen::Matrix3f deltaR;
     Eigen::Matrix3f rightJ; // right jacobian
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -208,7 +208,7 @@ public:
     }
 
 public:
-    float dT;
+    float dT{};
     Eigen::Matrix<float,15,15> C;
     Eigen::Matrix<float,15,15> Info;
     Eigen::DiagonalMatrix<float,6> Nga, NgaWalk;
