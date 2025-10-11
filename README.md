@@ -1,5 +1,21 @@
 # ORB-SLAM3
 
+### Building on Ubuntu 24.04
+
+Changes:
+* Does not use Pangolin
+* The build process is simpler (e.g., examples are not built)
+* All member variables in constructors are initialized, this fixes at least 1 crashing bug
+* A bunch of warnings are suppressed for now
+
+Build instructions:
+~~~
+mkdir build
+cd build
+cmake ..
+cmake --build
+~~~
+
 ### V1.0, December 22th, 2021
 **Authors:** Carlos Campos, Richard Elvira, Juan J. Gómez Rodríguez, [José M. M. Montiel](http://webdiis.unizar.es/~josemari/), [Juan D. Tardos](http://webdiis.unizar.es/~jdtardos/).
 
