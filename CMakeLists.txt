@@ -88,3 +88,21 @@ target_link_libraries(${PROJECT_NAME}
   -lboost_serialization
   -lcrypto
 )
+
+# Testing
+enable_testing()
+add_subdirectory(Thirdparty/googletest)
+
+add_executable(pinhole_test test/test_pinhole.cc)
+target_link_libraries(pinhole_test
+  PRIVATE
+  gtest_main
+  ${PROJECT_NAME}
+  ${OpenCV_LIBS}
+)
+target_include_directories(pinhole_test
+  PRIVATE
+  ${EIGEN3_INCLUDE_DIR}
+)
+include(GoogleTest)
+gtest_discover_tests(pinhole_test)
