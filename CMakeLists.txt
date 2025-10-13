@@ -3,6 +3,30 @@ project(ORB_SLAM3)
 
 message(STATUS "${PROJECT_NAME} build type: " ${CMAKE_BUILD_TYPE})
 
+# Extract vocabulary to build directory
+set(VOCABULARY_ARCHIVE "${PROJECT_SOURCE_DIR}/Vocabulary/ORBvoc.txt.tar.gz")
+set(VOCABULARY_OUTPUT_DIR "${CMAKE_BINARY_DIR}/Vocabulary")
+set(VOCABULARY_FILE "${VOCABULARY_OUTPUT_DIR}/ORBvoc.txt")
+
+if(EXISTS ${VOCABULARY_ARCHIVE})
+  message(STATUS "Extracting vocabulary file...")
+  file(MAKE_DIRECTORY ${VOCABULARY_OUTPUT_DIR})
+
+  execute_process(
+    COMMAND ${CMAKE_COMMAND} -E tar xzf ${VOCABULARY_ARCHIVE}
+    WORKING_DIRECTORY ${VOCABULARY_OUTPUT_DIR}
+    RESULT_VARIABLE TAR_RESULT
+  )
+
+  if(TAR_RESULT EQUAL 0)
+    message(STATUS "Vocabulary extracted to: ${VOCABULARY_FILE}")
+  else()
+    message(FATAL_ERROR "Failed to extract vocabulary archive")
+  endif()
+else()
+  message(WARNING "Vocabulary archive not found at: ${VOCABULARY_ARCHIVE}")
+endif()
+
 add_subdirectory(Thirdparty/Sophus)
 add_subdirectory(Thirdparty/DBoW2)
 add_subdirectory(Thirdparty/g2o)

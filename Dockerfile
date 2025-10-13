@@ -1,3 +1,5 @@
+# docker build --tag orb_slam3:latest .
+
 FROM ubuntu:24.04
 
 # Set DEBIAN_FRONTEND to noninteractive to avoid prompts during installation
@@ -21,14 +23,8 @@ COPY . /ORB_SLAM3
 # Set the working directory
 WORKDIR /ORB_SLAM3
 
-# Uncompress vocabulary
-RUN cd Vocabulary && tar -xf ORBvoc.txt.tar.gz
-
 # Remove the build directory if it exists
 RUN rm -rf build
 
-# Build the library
-RUN mkdir build && \
-    cd build && \
-    cmake .. && \
-    make
+# Build and test using the build script
+RUN chmod +x build.sh && ./build.sh

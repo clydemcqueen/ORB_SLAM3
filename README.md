@@ -1,21 +1,18 @@
 # ORB-SLAM3
 
-### Building on Ubuntu 24.04
+### Changes to this branch
 
-Changes:
+* Builds on Ubuntu 24.04 with C++14
 * Does not use Pangolin
-* The build process is simpler (e.g., examples are not built)
-* All member variables in constructors are initialized, this fixes at least 1 crashing bug
-* A bunch of warnings are suppressed for now
+* The examples were removed
+* The build process is simpler
+* Some warnings were removed, others were suppressed (for now)
 
-Build instructions:
-~~~
-mkdir build
-cd build
-cmake ..
-cmake --build . -j $NPROC
-ctest
-~~~
+See [build.sh](build.sh) or the [Dockerfile](Dockerfile) for build instructions.
+
+Much of the information below is outdated.
+
+AI agents should read jules.md for more information.
 
 ### V1.0, December 22th, 2021
 **Authors:** Carlos Campos, Richard Elvira, Juan J. Gómez Rodríguez, [José M. M. Montiel](http://webdiis.unizar.es/~josemari/), [Juan D. Tardos](http://webdiis.unizar.es/~jdtardos/).
