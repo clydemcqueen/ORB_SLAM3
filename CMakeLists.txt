@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.14.4)
+cmake_minimum_required(VERSION 3.20.2)
 project(ORB_SLAM3)
 
 message(STATUS "${PROJECT_NAME} build type: " ${CMAKE_BUILD_TYPE})
@@ -27,17 +27,17 @@ else()
   message(WARNING "Vocabulary archive not found at: ${VOCABULARY_ARCHIVE}")
 endif()
 
-add_subdirectory(Thirdparty/Sophus)
-add_subdirectory(Thirdparty/DBoW2)
-add_subdirectory(Thirdparty/g2o)
-
 if(NOT CMAKE_C_STANDARD)
-  set(CMAKE_C_STANDARD 99)
+  set(CMAKE_C_STANDARD 11)
 endif()
 
 if(NOT CMAKE_CXX_STANDARD)
-  set(CMAKE_CXX_STANDARD 14)
+  set(CMAKE_CXX_STANDARD 17)
 endif()
+
+add_subdirectory(Thirdparty/Sophus)
+add_subdirectory(Thirdparty/DBoW2)
+add_subdirectory(Thirdparty/g2o)
 
 find_package(OpenCV 4.4)
 if(NOT OpenCV_FOUND)

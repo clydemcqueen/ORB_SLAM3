@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.14.4)
+cmake_minimum_required(VERSION 3.20.2)
 project(DBoW2)
 
 if(NOT CMAKE_BUILD_TYPE)
@@ -6,14 +6,6 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 message(STATUS "${PROJECT_NAME} build type: " ${CMAKE_BUILD_TYPE})
-
-if(NOT CMAKE_C_STANDARD)
-  set(CMAKE_C_STANDARD 99)
-endif()
-
-if(NOT CMAKE_CXX_STANDARD)
-  set(CMAKE_CXX_STANDARD 14)
-endif()
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  -Wall  -O3 -march=native ")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall  -O3 -march=native")
