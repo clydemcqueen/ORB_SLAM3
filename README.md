@@ -13,7 +13,8 @@ Build instructions:
 mkdir build
 cd build
 cmake ..
-cmake --build
+cmake --build . -j $NPROC
+ctest
 ~~~
 
 ### V1.0, December 22th, 2021
