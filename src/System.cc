@@ -1324,6 +1324,11 @@ int System::GetTrackingState()
     return mTrackingState;
 }
 
+long unsigned int System::GetMapID() const
+{
+    return mpAtlas->GetCurrentMap()->GetId();
+}
+
 vector<MapPoint*> System::GetTrackedMapPoints()
 {
     unique_lock<mutex> lock(mMutexState);
