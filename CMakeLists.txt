@@ -50,8 +50,6 @@ find_package(Eigen3 3.1.0 REQUIRED)
 
 # Disable some warnings for now
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-conversion-null")
 
 add_library(${PROJECT_NAME} SHARED)
 

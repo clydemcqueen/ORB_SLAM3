@@ -12,7 +12,7 @@ See [build.sh](build.sh) or the [Dockerfile](Dockerfile) for build instructions.
 
 Much of the information below is outdated.
 
-AI agents should read jules.md for more information.
+AI agents should read AGENTS.md for more information.
 
 ### V1.0, December 22th, 2021
 **Authors:** Carlos Campos, Richard Elvira, Juan J. Gómez Rodríguez, [José M. M. Montiel](http://webdiis.unizar.es/~josemari/), [Juan D. Tardos](http://webdiis.unizar.es/~jdtardos/).
