@@ -1318,6 +1318,13 @@ void System::SaveDebugData(const int &initIdx)
 }
 
 
+std::vector<MapPoint*> System::GetCurrentMapPoints()
+{
+    const auto current_map = mpAtlas->GetCurrentMap();
+    return current_map ? current_map->GetAllMapPoints() : std::vector<MapPoint*>{};
+}
+
+
 int System::GetTrackingState()
 {
     unique_lock<mutex> lock(mMutexState);

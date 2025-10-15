@@ -171,6 +171,9 @@ public:
     // SaveMap(const string &filename);
     // LoadMap(const string &filename);
 
+    // Get current map
+    std::vector<MapPoint*> GetCurrentMapPoints();
+
     // Information from most recent processed frame
     // You can call this right after TrackMonocular (or stereo or RGBD)
     int GetTrackingState();
