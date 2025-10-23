@@ -48,6 +48,13 @@ message(STATUS "OpenCV version: " ${OpenCV_VERSION})
 
 find_package(Eigen3 3.1.0 REQUIRED)
 
+# Enable more warnings
+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  # Turn off pedantic for now
+  # add_compile_options(-Wall -Wextra -Wpedantic)
+  add_compile_options(-Wall -Wextra)
+endif()
+
 # Disable some warnings for now
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations")
 
