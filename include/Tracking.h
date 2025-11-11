@@ -194,6 +194,9 @@ public:
     vector<double> vdTrackTotal_ms;
 #endif
 
+    float GetTimeRecentlyLost() const { return time_recently_lost; }
+    void SetTimeRecentlyLost(float time_recently_lost_) { time_recently_lost = time_recently_lost_; }
+
 protected:
 
     // Main tracking function. It is independent of the input sensor.
