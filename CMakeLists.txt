@@ -55,6 +55,7 @@ add_library(${PROJECT_NAME} SHARED)
 
 target_sources(${PROJECT_NAME}
   PRIVATE
+  src/FrameDrawer.cc
   src/System.cc
   src/Tracking.cc
   src/LocalMapping.cc

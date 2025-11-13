@@ -174,6 +174,9 @@ public:
     // Get current map
     std::vector<MapPoint*> GetCurrentMapPoints();
 
+    // Project the tracked points onto the image
+    cv::Mat DrawFrame() const;
+
     // Information from most recent processed frame
     // You can call this right after TrackMonocular (or stereo or RGBD)
     int GetTrackingState();

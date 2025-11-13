@@ -33,6 +33,8 @@
 #include <boost/archive/xml_iarchive.hpp>
 #include <boost/archive/xml_oarchive.hpp>
 
+#include "FrameDrawer.h"
+
 namespace ORB_SLAM3
 {
 
@@ -182,7 +184,7 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
         mpAtlas->SetInertialSensor();
 
     //Create Drawers. These are used by the Viewer
-    // mpFrameDrawer = new FrameDrawer(mpAtlas);
+    mpFrameDrawer = new FrameDrawer(mpAtlas);
     // mpMapDrawer = new MapDrawer(mpAtlas, strSettingsFile, settings_);
 
     //Initialize the Tracking thread
@@ -1329,6 +1331,10 @@ std::vector<MapPoint*> System::GetCurrentMapPoints()
     return current_map ? current_map->GetAllMapPoints() : std::vector<MapPoint*>{};
 }
 
+cv::Mat System::DrawFrame() const
+{
+    return mpTracker->DrawFrame();
+}
 
 int System::GetTrackingState()
 {

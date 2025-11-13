@@ -197,6 +197,8 @@ public:
     float GetTimeRecentlyLost() const { return time_recently_lost; }
     void SetTimeRecentlyLost(float time_recently_lost_) { time_recently_lost = time_recently_lost_; }
 
+    cv::Mat DrawFrame() const;
+
 protected:
 
     // Main tracking function. It is independent of the input sensor.

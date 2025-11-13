@@ -20,7 +20,7 @@
 #include "Tracking.h"
 
 #include "ORBmatcher.h"
-// #include "FrameDrawer.h"
+#include "FrameDrawer.h"
 #include "Converter.h"
 #include "G2oTypes.h"
 #include "Optimizer.h"
@@ -1907,7 +1907,7 @@ void Tracking::Track()
             MonocularInitialization();
         }
 
-        //mpFrameDrawer->Update(this);
+        mpFrameDrawer->Update(this);
 
         if(mState!=OK) // If rightly initialized, mState=OK
         {
@@ -2199,7 +2199,7 @@ void Tracking::Track()
 #endif
 
         // Update drawer
-        // mpFrameDrawer->Update(this);
+        mpFrameDrawer->Update(this);
         // if(mCurrentFrame.isSet())
             // mpMapDrawer->SetCurrentCameraPose(mCurrentFrame.GetPose());
 
@@ -3932,6 +3932,11 @@ void Tracking::ResetActiveMap(bool bLocMap)
 vector<MapPoint*> Tracking::GetLocalMapMPS()
 {
     return mvpLocalMapPoints;
+}
+
+cv::Mat Tracking::DrawFrame() const
+{
+    return mpFrameDrawer->DrawFrame();
 }
 
 void Tracking::ChangeCalibration(const string &strSettingPath)
