@@ -480,6 +480,12 @@ namespace ORB_SLAM3 {
         bool found;
 
         thFarPoints_ = readParameter<float>(fSettings,"System.thFarPoints",found,false);
+
+        timeRecentlyLost_ = readParameter<float>(fSettings,"System.timeRecentlyLost",found,false);
+        if (!found) {
+            // Existing default
+            timeRecentlyLost_ = 5.0;
+        }
     }
 
     void Settings::precomputeRectificationMaps() {

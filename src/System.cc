@@ -208,6 +208,11 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
     else
         mpLocalMapper->mbFarPoints = false;
 
+    // Determine the number of seconds the tracker will stay in the RECENTLY_LOST state before moving to LOST
+    float time_recently_lost = settings_ ? settings_->timeRecentlyLost() : fsSettings["timeRecentlyLost"];
+    mpTracker->SetTimeRecentlyLost(time_recently_lost);
+    cout << "Stay in RECENTLY_LOST for " << time_recently_lost << " seconds" << endl;
+
     //Initialize the Loop Closing thread and launch
     // mSensor!=MONOCULAR && mSensor!=IMU_MONOCULAR
     mpLoopCloser = new LoopClosing(mpAtlas, mpKeyFrameDatabase, mpVocabulary, mSensor!=MONOCULAR, activeLC); // mSensor!=MONOCULAR);

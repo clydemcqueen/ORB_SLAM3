@@ -116,6 +116,7 @@ namespace ORB_SLAM3 {
         std::string atlasSaveFile() {return sSaveto_;}
 
         float thFarPoints() {return thFarPoints_;}
+        float timeRecentlyLost() {return timeRecentlyLost_;}
 
         cv::Mat M1l() {return M1l_;}
         cv::Mat M2l() {return M2l_;}
@@ -227,7 +228,7 @@ namespace ORB_SLAM3 {
          * Other stuff
          */
         float thFarPoints_;
-
+        float timeRecentlyLost_;  // Timeout in seconds before creating a new map after tracking is lost
     };
 };
 
