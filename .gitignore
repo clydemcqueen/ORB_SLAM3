@@ -4,3 +4,9 @@ Thirdparty/g2o/config.h
 build/
 cmake-build-debug/
 .idea/
+
+# TODO zip up the images and add to the website
+evaluation/images
+
+# Do not upload the unzipped Vocab file
+Vocabulary/ORBvoc.txt

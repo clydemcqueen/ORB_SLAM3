@@ -129,3 +129,25 @@ target_include_directories(pinhole_test
 )
 include(GoogleTest)
 gtest_discover_tests(pinhole_test)
+
+add_executable(test_mono test/test_mono.cc)
+target_link_libraries(test_mono
+  PRIVATE
+  gtest_main
+  ${PROJECT_NAME}
+  ${OpenCV_LIBS}
+)
+target_include_directories(test_mono
+  PRIVATE
+  ${EIGEN3_INCLUDE_DIR}
+)
+
+# Pass absolute paths so the test can be run from anywhere
+target_compile_definitions(test_mono PRIVATE
+  VOCABULARY_PATH="${PROJECT_SOURCE_DIR}/Vocabulary/ORBvoc.txt"
+  SETTINGS_PATH="${PROJECT_SOURCE_DIR}/evaluation/param/dwe_wet_800_600.yaml"
+  IMAGES_PATH="${PROJECT_SOURCE_DIR}/evaluation/images"
+  BASELINE_PATH="${PROJECT_SOURCE_DIR}/evaluation/baseline.csv"
+)
+
+gtest_discover_tests(test_mono)
