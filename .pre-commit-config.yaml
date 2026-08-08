@@ -1,0 +1,28 @@
+repos:
+  - repo: https://github.com/pre-commit/mirrors-clang-format
+    rev: v18.1.8
+    hooks:
+      - id: clang-format
+        types_or: [c++, c]
+        files: ^test/.*\.cc$
+
+  - repo: local
+    hooks:
+      - id: clang-tidy
+        name: clang-tidy
+        entry: clang-tidy
+        language: system
+        types_or: [c++]
+        files: ^test/.*\.cc$
+        args:
+          - "--extra-arg=-std=c++17"
+          - "--extra-arg=-I."
+          - "--extra-arg=-Iinclude"
+          - "--extra-arg=-Iinclude/CameraModels"
+          - "--extra-arg=-isystemThirdparty/Sophus"
+          - "--extra-arg=-isystem/usr/include/eigen3"
+          - "--extra-arg=-isystem/usr/include/opencv4"
+          - "--extra-arg=-DVOCABULARY_PATH=\"\""
+          - "--extra-arg=-DSETTINGS_PATH=\"\""
+          - "--extra-arg=-DIMAGES_PATH=\"\""
+          - "--extra-arg=-DBASELINE_PATH=\"\""
