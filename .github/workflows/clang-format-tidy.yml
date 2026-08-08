@@ -17,7 +17,11 @@ jobs:
       - name: Install Clang Tools and Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y clang-format clang-tidy libopencv-dev libeigen3-dev libgtest-dev libboost-serialization-dev libssl-dev
+          sudo apt-get install -y cmake clang-format clang-tidy libopencv-dev libeigen3-dev libgtest-dev libboost-serialization-dev libssl-dev
+
+      - name: Configure CMake
+        run: |
+          cmake -B build
 
       - name: Check Formatting (clang-format)
         run: |
