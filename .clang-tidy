@@ -6,6 +6,7 @@ Checks: >
   modernize-*,
   performance-*,
   readability-*,
+  -bugprone-easily-swappable-parameters,
   -cppcoreguidelines-avoid-non-const-global-variables,
   -google-readability-todo,
   -google-readability-braces-around-statements,

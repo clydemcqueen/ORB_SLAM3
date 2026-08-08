@@ -25,4 +25,4 @@ jobs:
 
       - name: Check Linting (clang-tidy)
         run: |
-          clang-tidy test/*.cc -- -std=c++17 -Iinclude -IThirdparty/Sophus -I/usr/include/opencv4
+          clang-tidy test/*.cc -- -std=c++17 -I. -Iinclude -Iinclude/CameraModels -isystem Thirdparty/Sophus -isystem /usr/include/eigen3 -isystem /usr/include/opencv4 -DVOCABULARY_PATH=\"\" -DSETTINGS_PATH=\"\" -DIMAGES_PATH=\"\" -DBASELINE_PATH=\"\"

@@ -30,6 +30,7 @@ const std::string SETTINGS_FILE = SETTINGS_PATH;
 const std::string IMAGES_DIR = IMAGES_PATH;
 const std::string BASELINE_FILE = BASELINE_PATH;
 
+// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 void loadImages(const std::string& dir_path, std::vector<std::string>& image_files,
                 std::vector<double>& timestamps) {
     for (const auto& entry : fs::directory_iterator(dir_path)) {
