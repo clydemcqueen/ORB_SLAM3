@@ -7,6 +7,11 @@
 * The examples were removed
 * The build process is simpler
 * Some warnings were removed, others were suppressed (for now)
+* Adds github CI
+* New mono test data
+
+TODO
+* The mono test data includes first 500 images from orca5_1_tests/2026_08_05_dive5/bags/rosbag2_2026_08_05-08_06_55, extracted with orca5_1_tests/scripts/extract_images.py. Zip up these 500 images, upload them, and provide setup instructions.
 
 See [build.sh](build.sh) or the [Dockerfile](Dockerfile) for build instructions.
 

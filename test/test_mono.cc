@@ -20,6 +20,7 @@ struct FrameResult {
     double timestamp;
     int tracking_state;
     int num_features;
+    int num_inliers;
     float tx, ty, tz, qx, qy, qz, qw;
 };
 
@@ -70,12 +71,12 @@ TEST(ORBSLAM3, MonoEvaluationTest) {
         std::getline(f, line);
         while (std::getline(f, line)) {
             FrameResult r;
-            // timestamp,tracking_state,num_features,tx,ty,tz,qx,qy,qz,qw
+            // timestamp,tracking_state,num_features,num_inliers,tx,ty,tz,qx,qy,qz,qw
             char comma;
             std::stringstream ss(line);
             ss >> r.timestamp >> comma >> r.tracking_state >> comma >> r.num_features >> comma >>
-                r.tx >> comma >> r.ty >> comma >> r.tz >> comma >> r.qx >> comma >> r.qy >> comma >>
-                r.qz >> comma >> r.qw;
+                r.num_inliers >> comma >> r.tx >> comma >> r.ty >> comma >> r.tz >> comma >> r.qx >>
+                comma >> r.qy >> comma >> r.qz >> comma >> r.qw;
             baseline.push_back(r);
         }
         f.close();
@@ -92,13 +93,14 @@ TEST(ORBSLAM3, MonoEvaluationTest) {
     if (create_baseline) {
         f_out.open(BASELINE_FILE);
         f_out << std::fixed << std::setprecision(9);
-        f_out << "timestamp,tracking_state,num_features,tx,ty,tz,qx,qy,qz,qw\n";
+        f_out << "timestamp,tracking_state,num_features,num_inliers,tx,ty,tz,qx,qy,qz,qw\n";
     }
 
     float pos_tolerance =
         0.1F;  // Increased to 0.1m due to non-determinism and monocular scale drift
     float rot_tolerance = 0.05F;
     int num_features_tolerance = 100;  // TODO this should be much tighter!
+    int inliers_tolerance = 300;  // High tolerance due to multi-threaded keyframe insertion timing
 
     for (size_t i = 0; i < image_files.size(); i++) {
         cv::Mat im = cv::imread(image_files[i], cv::IMREAD_UNCHANGED);
@@ -108,15 +110,19 @@ TEST(ORBSLAM3, MonoEvaluationTest) {
         Sophus::SE3f Tcw = SLAM.TrackMonocular(im, tframe);
 
         int state = SLAM.GetTrackingState();
-        int num_features = static_cast<int>(SLAM.GetTrackedMapPoints().size());
+        std::vector<ORB_SLAM3::MapPoint*> tracked_mps = SLAM.GetTrackedMapPoints();
+        int num_features = static_cast<int>(tracked_mps.size());
+        int num_inliers =
+            static_cast<int>(std::count_if(tracked_mps.begin(), tracked_mps.end(),
+                                           [](ORB_SLAM3::MapPoint* p) { return p != nullptr; }));
 
         Eigen::Vector3f trans = Tcw.translation();
         Eigen::Quaternionf q = Tcw.unit_quaternion();
 
         if (create_baseline) {
-            f_out << tframe << "," << state << "," << num_features << "," << trans.x() << ","
-                  << trans.y() << "," << trans.z() << "," << q.x() << "," << q.y() << "," << q.z()
-                  << "," << q.w() << "\n";
+            f_out << tframe << "," << state << "," << num_features << "," << num_inliers << ","
+                  << trans.x() << "," << trans.y() << "," << trans.z() << "," << q.x() << ","
+                  << q.y() << "," << q.z() << "," << q.w() << "\n";
         } else {
             const FrameResult& b = baseline[i];
 
@@ -139,6 +145,8 @@ TEST(ORBSLAM3, MonoEvaluationTest) {
                 // differences
                 EXPECT_NEAR(num_features, b.num_features, num_features_tolerance)
                     << "Feature count mismatch at frame " << i;
+                EXPECT_NEAR(num_inliers, b.num_inliers, inliers_tolerance)
+                    << "Inlier count mismatch at frame " << i;
             }
         }
     }
