@@ -1,0 +1,34 @@
+name: C++ Formatting and Linting
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  format-and-lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install Clang Tools and Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake clang-format clang-tidy libopencv-dev libeigen3-dev libgtest-dev libboost-serialization-dev libssl-dev
+
+      - name: Configure CMake
+        run: |
+          cmake -B build
+
+      - name: Check Formatting (clang-format)
+        run: |
+          clang-format --dry-run --Werror test/*.cc
+
+      - name: Check Linting (clang-tidy)
+        run: |
+          clang-tidy test/*.cc -- -std=c++17 -I. -Iinclude -Iinclude/CameraModels -isystem Thirdparty/Sophus -isystem /usr/include/eigen3 -isystem /usr/include/opencv4 -DVOCABULARY_PATH=\"\" -DSETTINGS_PATH=\"\" -DIMAGES_PATH=\"\" -DBASELINE_PATH=\"\"
