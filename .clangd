@@ -1,0 +1,6 @@
+# Disable clang-tidy diagnostics on all files except test/
+If:
+  PathExclude: .*/test/.*
+Diagnostics:
+  ClangTidy:
+    Remove: '*'
