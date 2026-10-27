@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.20.2)
 project(ORB_SLAM3)
 
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Release)
+endif()
+
 message(STATUS "${PROJECT_NAME} build type: " ${CMAKE_BUILD_TYPE})
 
 # Extract vocabulary to build directory
