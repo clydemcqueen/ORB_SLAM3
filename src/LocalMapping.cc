@@ -1404,6 +1404,7 @@ void LocalMapping::InitializeIMU(float priorG, float priorA, bool bFIBA)
             // Backproject using corrected camera
             pMP->SetWorldPos(pRefKF->GetPoseInverse() * Xc);
         }
+        pMP->UpdateNormalAndDepth();
     }
 
     Verbose::PrintMess("Map updated!", Verbose::VERBOSITY_NORMAL);

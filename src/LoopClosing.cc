@@ -2482,6 +2482,7 @@ void LoopClosing::RunGlobalBundleAdjustment(Map* pActiveMap, unsigned long nLoop
                     // Backproject using corrected camera
                     pMP->SetWorldPos(pRefKF->GetPoseInverse() * Xc);
                 }
+                pMP->UpdateNormalAndDepth();
             }
 
             pActiveMap->InformNewBigChange();
