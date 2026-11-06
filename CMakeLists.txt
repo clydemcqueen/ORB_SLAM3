@@ -134,27 +134,65 @@ target_include_directories(pinhole_test
 include(GoogleTest)
 gtest_discover_tests(pinhole_test)
 
-add_executable(test_mono test/test_mono.cc)
-target_link_libraries(test_mono
+add_executable(test_mono_orca5_1 test/test_mono.cc)
+target_link_libraries(test_mono_orca5_1
   PRIVATE
   gtest_main
   ${PROJECT_NAME}
   ${OpenCV_LIBS}
 )
-target_include_directories(test_mono
+target_include_directories(test_mono_orca5_1
   PRIVATE
   ${EIGEN3_INCLUDE_DIR}
 )
-
-# Pass absolute paths so the test can be run from anywhere
-target_compile_definitions(test_mono PRIVATE
+target_compile_definitions(test_mono_orca5_1 PRIVATE
   VOCABULARY_PATH="${VOCABULARY_FILE}"
-  SETTINGS_PATH="${PROJECT_SOURCE_DIR}/evaluation/param/dwe_wet_800_600.yaml"
-  IMAGES_PATH="${PROJECT_SOURCE_DIR}/evaluation/images"
-  BASELINE_PATH="${PROJECT_SOURCE_DIR}/evaluation/baseline.csv"
+  SETTINGS_PATH="${PROJECT_SOURCE_DIR}/evaluation/orca5_1/dwe_wet_800_600.yaml"
+  IMAGES_PATH="${PROJECT_SOURCE_DIR}/evaluation/orca5_1/images"
+  BASELINE_PATH="${PROJECT_SOURCE_DIR}/evaluation/orca5_1/baseline_mono.csv"
+  TEST_NAME=MonoOrca5_1
 )
+gtest_discover_tests(test_mono_orca5_1)
 
-gtest_discover_tests(test_mono)
+add_executable(test_mono_gazebo test/test_mono.cc)
+target_link_libraries(test_mono_gazebo
+  PRIVATE
+  gtest_main
+  ${PROJECT_NAME}
+  ${OpenCV_LIBS}
+)
+target_include_directories(test_mono_gazebo
+  PRIVATE
+  ${EIGEN3_INCLUDE_DIR}
+)
+target_compile_definitions(test_mono_gazebo PRIVATE
+  VOCABULARY_PATH="${VOCABULARY_FILE}"
+  SETTINGS_PATH="${PROJECT_SOURCE_DIR}/evaluation/gazebo/sim.yaml"
+  IMAGES_PATH="${PROJECT_SOURCE_DIR}/evaluation/gazebo/images"
+  BASELINE_PATH="${PROJECT_SOURCE_DIR}/evaluation/gazebo/baseline_mono.csv"
+  TEST_NAME=MonoGazebo
+)
+gtest_discover_tests(test_mono_gazebo)
+
+add_executable(test_mono_imu_gazebo test/test_mono_imu.cc)
+target_link_libraries(test_mono_imu_gazebo
+  PRIVATE
+  gtest_main
+  ${PROJECT_NAME}
+  ${OpenCV_LIBS}
+)
+target_include_directories(test_mono_imu_gazebo
+  PRIVATE
+  ${EIGEN3_INCLUDE_DIR}
+)
+target_compile_definitions(test_mono_imu_gazebo PRIVATE
+  VOCABULARY_PATH="${VOCABULARY_FILE}"
+  SETTINGS_PATH="${PROJECT_SOURCE_DIR}/evaluation/gazebo/sim.yaml"
+  IMAGES_PATH="${PROJECT_SOURCE_DIR}/evaluation/gazebo/images"
+  IMU_PATH="${PROJECT_SOURCE_DIR}/evaluation/gazebo/imu.csv"
+  BASELINE_PATH="${PROJECT_SOURCE_DIR}/evaluation/gazebo/baseline_mono_imu.csv"
+)
+gtest_discover_tests(test_mono_imu_gazebo)
 
 # Standalone CLAHE evaluation experiment (not part of CTest / test suite)
 add_executable(clahe_mono_experiment evaluation/clahe_mono_experiment.cc)
@@ -169,8 +207,8 @@ target_include_directories(clahe_mono_experiment
 )
 target_compile_definitions(clahe_mono_experiment PRIVATE
   VOCABULARY_PATH="${VOCABULARY_FILE}"
-  SETTINGS_PATH="${PROJECT_SOURCE_DIR}/evaluation/param/dwe_wet_800_600.yaml"
-  IMAGES_PATH="${PROJECT_SOURCE_DIR}/evaluation/images"
-  BASELINE_PATH="${PROJECT_SOURCE_DIR}/evaluation/baseline.csv"
+  SETTINGS_PATH="${PROJECT_SOURCE_DIR}/evaluation/orca5_1/dwe_wet_800_600.yaml"
+  IMAGES_PATH="${PROJECT_SOURCE_DIR}/evaluation/orca5_1/images"
+  BASELINE_PATH="${PROJECT_SOURCE_DIR}/evaluation/orca5_1/baseline_mono.csv"
 )
 

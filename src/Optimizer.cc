@@ -3448,11 +3448,11 @@ void Optimizer::InertialOptimization(Map *pMap, Eigen::Matrix3d &Rwg, double &sc
         optimizer.addVertex(VV);
 
         // Vertex of fixed biases
-        VertexGyroBias* VG = new VertexGyroBias(vpKFs.front());
+        VertexGyroBias* VG = new VertexGyroBias(pKFi);
         VG->setId(2*(maxKFid+1)+(pKFi->mnId));
         VG->setFixed(true);
         optimizer.addVertex(VG);
-        VertexAccBias* VA = new VertexAccBias(vpKFs.front());
+        VertexAccBias* VA = new VertexAccBias(pKFi);
         VA->setId(3*(maxKFid+1)+(pKFi->mnId));
         VA->setFixed(true);
         optimizer.addVertex(VA);
@@ -3478,6 +3478,10 @@ void Optimizer::InertialOptimization(Map *pMap, Eigen::Matrix3d &Rwg, double &sc
         {
             if(pKFi->isBad() || pKFi->mPrevKF->mnId>maxKFid)
                 continue;
+            if(!pKFi->mpImuPreintegrated)
+                continue;
+
+            pKFi->mpImuPreintegrated->SetNewBias(pKFi->mPrevKF->GetImuBias());
                 
             g2o::HyperGraph::Vertex* VP1 = optimizer.vertex(pKFi->mPrevKF->mnId);
             g2o::HyperGraph::Vertex* VV1 = optimizer.vertex((maxKFid+1)+pKFi->mPrevKF->mnId);
