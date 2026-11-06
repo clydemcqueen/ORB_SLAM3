@@ -219,7 +219,7 @@ void LocalMapping::Run()
                                 cout << "start VIBA 2" << endl;
                                 mpCurrentKeyFrame->GetMap()->SetIniertialBA2();
                                 if (mbMonocular)
-                                    InitializeIMU(0.f, 0.f, true);
+                                    InitializeIMU(1.f, 1e4f, true);
                                 else
                                     InitializeIMU(0.f, 0.f, true);
 
