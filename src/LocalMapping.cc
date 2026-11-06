@@ -1276,22 +1276,21 @@ void LocalMapping::InitializeIMU(float priorG, float priorA, bool bFIBA)
             Sophus::SE3f Twg(IMU::NormalizeRotation(mRwg.cast<float>().transpose()), Eigen::Vector3f::Zero());
             mpAtlas->GetCurrentMap()->ApplyScaledRotation(Twg, mScale, true);
             mpTracker->UpdateFrameIMU(mScale, vpKF[0]->GetImuBias(), mpCurrentKeyFrame);
+        } else {
+            mpTracker->UpdateFrameIMU(1.0, vpKF[0]->GetImuBias(), mpCurrentKeyFrame);
         }
 
         // Check if initialization OK
         if (!mpAtlas->isImuInitialized())
+        {
             for (int i = 0; i < N; i++) {
                 KeyFrame *pKF2 = vpKF[i];
                 pKF2->bImu = true;
             }
-    }
-
-    mpTracker->UpdateFrameIMU(1.0,vpKF[0]->GetImuBias(),mpCurrentKeyFrame);
-    if (!mpAtlas->isImuInitialized())
-    {
-        mpAtlas->SetImuInitialized();
-        mpTracker->t0IMU = mpTracker->mCurrentFrame.mTimeStamp;
-        mpCurrentKeyFrame->bImu = true;
+            mpAtlas->SetImuInitialized();
+            mpTracker->t0IMU = mpTracker->mCurrentFrame.mTimeStamp;
+            mpCurrentKeyFrame->bImu = true;
+        }
     }
 
     std::chrono::steady_clock::time_point t4 = std::chrono::steady_clock::now();
