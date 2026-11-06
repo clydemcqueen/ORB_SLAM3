@@ -1241,15 +1241,9 @@ void LocalMapping::InitializeIMU(float priorG, float priorA, bool bFIBA)
             (*itKF)->mPrevKF->SetVelocity(_vel);
         }
 
-        dirG = dirG/dirG.norm();
-        Eigen::Vector3f gI(0.0f, 0.0f, -1.0f);
-        Eigen::Vector3f v = gI.cross(dirG);
-        const float nv = v.norm();
-        const float cosg = gI.dot(dirG);
-        const float ang = acos(cosg);
-        Eigen::Vector3f vzg = v*ang/nv;
-        Rwg = Sophus::SO3f::exp(vzg).matrix();
-        mRwg = Rwg.cast<double>();
+        mRwg = Eigen::Quaterniond::FromTwoVectors(
+            Eigen::Vector3d(0.0, 0.0, -1.0), dirG.cast<double>()).normalized().toRotationMatrix();
+        Rwg = IMU::NormalizeRotation(mRwg.cast<float>());
         mTinit = mpCurrentKeyFrame->mTimeStamp-mFirstTs;
     }
     else
@@ -1279,7 +1273,7 @@ void LocalMapping::InitializeIMU(float priorG, float priorA, bool bFIBA)
     {
         unique_lock<mutex> lock(mpAtlas->GetCurrentMap()->mMutexMapUpdate);
         if ((fabs(mScale - 1.f) > 0.00001) || !mbMonocular) {
-            Sophus::SE3f Twg(mRwg.cast<float>().transpose(), Eigen::Vector3f::Zero());
+            Sophus::SE3f Twg(IMU::NormalizeRotation(mRwg.cast<float>().transpose()), Eigen::Vector3f::Zero());
             mpAtlas->GetCurrentMap()->ApplyScaledRotation(Twg, mScale, true);
             mpTracker->UpdateFrameIMU(mScale, vpKF[0]->GetImuBias(), mpCurrentKeyFrame);
         }
@@ -1475,7 +1469,7 @@ void LocalMapping::ScaleRefinement()
     std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
     if ((fabs(mScale-1.f)>0.002)||!mbMonocular)
     {
-        Sophus::SE3f Tgw(mRwg.cast<float>().transpose(),Eigen::Vector3f::Zero());
+        Sophus::SE3f Tgw(IMU::NormalizeRotation(mRwg.cast<float>().transpose()),Eigen::Vector3f::Zero());
         mpAtlas->GetCurrentMap()->ApplyScaledRotation(Tgw,mScale,true);
         mpTracker->UpdateFrameIMU(mScale,mpCurrentKeyFrame->GetImuBias(),mpCurrentKeyFrame);
     }
