@@ -25,4 +25,6 @@ repos:
           - "--extra-arg=-DVOCABULARY_PATH=\"\""
           - "--extra-arg=-DSETTINGS_PATH=\"\""
           - "--extra-arg=-DIMAGES_PATH=\"\""
+          - "--extra-arg=-DIMU_PATH=\"\""
           - "--extra-arg=-DBASELINE_PATH=\"\""
+          - "--extra-arg=-DTEST_NAME=MonoEvaluationTest"

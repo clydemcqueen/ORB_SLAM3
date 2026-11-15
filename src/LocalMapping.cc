@@ -133,6 +133,9 @@ void LocalMapping::Run()
 
                         if(dist>0.05)
                             mTinit += mpCurrentKeyFrame->mTimeStamp - mpCurrentKeyFrame->mPrevKF->mTimeStamp;
+#if 0
+                        // If the vehicle stops moving when mTinit < 10 seconds then reset
+                        // This is a fairly like occurence for an ROV, so disable this check
                         if(!mpCurrentKeyFrame->GetMap()->GetIniertialBA2())
                         {
                             if((mTinit<10.f) && (dist<0.02))
@@ -144,6 +147,7 @@ void LocalMapping::Run()
                                 mbBadImu = true;
                             }
                         }
+#endif
 
                         bool bLarge = ((mpTracker->GetMatchesInliers()>75)&&mbMonocular)||((mpTracker->GetMatchesInliers()>100)&&!mbMonocular);
                         Optimizer::LocalInertialBA(mpCurrentKeyFrame, &mbAbortBA, mpCurrentKeyFrame->GetMap(),num_FixedKF_BA,num_OptKF_BA,num_MPs_BA,num_edges_BA, bLarge, !mpCurrentKeyFrame->GetMap()->GetIniertialBA2());
@@ -219,7 +223,7 @@ void LocalMapping::Run()
                                 cout << "start VIBA 2" << endl;
                                 mpCurrentKeyFrame->GetMap()->SetIniertialBA2();
                                 if (mbMonocular)
-                                    InitializeIMU(0.f, 0.f, true);
+                                    InitializeIMU(1.f, 1e4f, true);
                                 else
                                     InitializeIMU(0.f, 0.f, true);
 
@@ -572,7 +576,7 @@ void LocalMapping::CreateNewMapPoints()
                 cosParallaxStereo2 = cos(2*atan2(pKF2->mb/2,pKF2->mvDepth[idx2]));
 
             if (bStereo1 || bStereo2) totalStereoPts++;
-            
+
             cosParallaxStereo = min(cosParallaxStereo1,cosParallaxStereo2);
 
             Eigen::Vector3f x3D;
@@ -694,7 +698,7 @@ void LocalMapping::CreateNewMapPoints()
             MapPoint* pMP = new MapPoint(x3D, mpCurrentKeyFrame, mpAtlas->GetCurrentMap());
             if (bPointStereo)
                 countStereo++;
-            
+
             pMP->AddObservation(mpCurrentKeyFrame,idx1);
             pMP->AddObservation(pKF2,idx2);
 
@@ -708,7 +712,7 @@ void LocalMapping::CreateNewMapPoints()
             mpAtlas->AddMapPoint(pMP);
             mlpRecentAddedMapPoints.push_back(pMP);
         }
-    }    
+    }
 }
 
 void LocalMapping::SearchInNeighbors()
@@ -1159,7 +1163,7 @@ bool LocalMapping::CheckFinish()
 void LocalMapping::SetFinish()
 {
     unique_lock<mutex> lock(mMutexFinish);
-    mbFinished = true;    
+    mbFinished = true;
     unique_lock<mutex> lock2(mMutexStop);
     mbStopped = true;
 }
@@ -1241,15 +1245,9 @@ void LocalMapping::InitializeIMU(float priorG, float priorA, bool bFIBA)
             (*itKF)->mPrevKF->SetVelocity(_vel);
         }
 
-        dirG = dirG/dirG.norm();
-        Eigen::Vector3f gI(0.0f, 0.0f, -1.0f);
-        Eigen::Vector3f v = gI.cross(dirG);
-        const float nv = v.norm();
-        const float cosg = gI.dot(dirG);
-        const float ang = acos(cosg);
-        Eigen::Vector3f vzg = v*ang/nv;
-        Rwg = Sophus::SO3f::exp(vzg).matrix();
-        mRwg = Rwg.cast<double>();
+        mRwg = Eigen::Quaterniond::FromTwoVectors(
+            Eigen::Vector3d(0.0, 0.0, -1.0), dirG.cast<double>()).normalized().toRotationMatrix();
+        Rwg = IMU::NormalizeRotation(mRwg.cast<float>());
         mTinit = mpCurrentKeyFrame->mTimeStamp-mFirstTs;
     }
     else
@@ -1279,25 +1277,24 @@ void LocalMapping::InitializeIMU(float priorG, float priorA, bool bFIBA)
     {
         unique_lock<mutex> lock(mpAtlas->GetCurrentMap()->mMutexMapUpdate);
         if ((fabs(mScale - 1.f) > 0.00001) || !mbMonocular) {
-            Sophus::SE3f Twg(mRwg.cast<float>().transpose(), Eigen::Vector3f::Zero());
+            Sophus::SE3f Twg(IMU::NormalizeRotation(mRwg.cast<float>().transpose()), Eigen::Vector3f::Zero());
             mpAtlas->GetCurrentMap()->ApplyScaledRotation(Twg, mScale, true);
             mpTracker->UpdateFrameIMU(mScale, vpKF[0]->GetImuBias(), mpCurrentKeyFrame);
+        } else {
+            mpTracker->UpdateFrameIMU(1.0, vpKF[0]->GetImuBias(), mpCurrentKeyFrame);
         }
 
         // Check if initialization OK
         if (!mpAtlas->isImuInitialized())
+        {
             for (int i = 0; i < N; i++) {
                 KeyFrame *pKF2 = vpKF[i];
                 pKF2->bImu = true;
             }
-    }
-
-    mpTracker->UpdateFrameIMU(1.0,vpKF[0]->GetImuBias(),mpCurrentKeyFrame);
-    if (!mpAtlas->isImuInitialized())
-    {
-        mpAtlas->SetImuInitialized();
-        mpTracker->t0IMU = mpTracker->mCurrentFrame.mTimeStamp;
-        mpCurrentKeyFrame->bImu = true;
+            mpAtlas->SetImuInitialized();
+            mpTracker->t0IMU = mpTracker->mCurrentFrame.mTimeStamp;
+            mpCurrentKeyFrame->bImu = true;
+        }
     }
 
     std::chrono::steady_clock::time_point t4 = std::chrono::steady_clock::now();
@@ -1404,6 +1401,7 @@ void LocalMapping::InitializeIMU(float priorG, float priorA, bool bFIBA)
             // Backproject using corrected camera
             pMP->SetWorldPos(pRefKF->GetPoseInverse() * Xc);
         }
+        pMP->UpdateNormalAndDepth();
     }
 
     Verbose::PrintMess("Map updated!", Verbose::VERBOSITY_NORMAL);
@@ -1467,14 +1465,14 @@ void LocalMapping::ScaleRefinement()
         bInitializing=false;
         return;
     }
-    
+
     Sophus::SO3d so3wg(mRwg);
     // Before this line we are not changing the map
     unique_lock<mutex> lock(mpAtlas->GetCurrentMap()->mMutexMapUpdate);
     std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
     if ((fabs(mScale-1.f)>0.002)||!mbMonocular)
     {
-        Sophus::SE3f Tgw(mRwg.cast<float>().transpose(),Eigen::Vector3f::Zero());
+        Sophus::SE3f Tgw(IMU::NormalizeRotation(mRwg.cast<float>().transpose()),Eigen::Vector3f::Zero());
         mpAtlas->GetCurrentMap()->ApplyScaledRotation(Tgw,mScale,true);
         mpTracker->UpdateFrameIMU(mScale,mpCurrentKeyFrame->GetImuBias(),mpCurrentKeyFrame);
     }

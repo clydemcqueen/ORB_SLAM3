@@ -2865,13 +2865,23 @@ void Optimizer::LocalInertialBA(KeyFrame *pKF, bool *pbStopFlag, Map *pMap, int&
         assert(mit->second>=3);
     }
 
+    // Allow Tracking to interrupt LocalInertialBA safely only after VIBA2 has completed
+    const bool bAllowInterrupt = (!bRecInit && pbStopFlag != nullptr);
+    if (bAllowInterrupt) {
+        if (*pbStopFlag)
+            return;
+        optimizer.setForceStopFlag(pbStopFlag);
+    }
+
     optimizer.initializeOptimization();
     optimizer.computeActiveErrors();
     float err = optimizer.activeRobustChi2();
-    optimizer.optimize(opt_it); // Originally to 2
+    const int nOptIterations = optimizer.optimize(opt_it); // Originally to 2
     float err_end = optimizer.activeRobustChi2();
-    if(pbStopFlag)
-        optimizer.setForceStopFlag(pbStopFlag);
+
+    const bool bInterrupted = (bAllowInterrupt && *pbStopFlag);
+    if (nOptIterations <= 0)
+        return;
 
     vector<pair<KeyFrame*,MapPoint*> > vToErase;
     vToErase.reserve(vpEdgesMono.size()+vpEdgesStereo.size());
@@ -2916,15 +2926,17 @@ void Optimizer::LocalInertialBA(KeyFrame *pKF, bool *pbStopFlag, Map *pMap, int&
 
 
     // TODO: Some convergence problems have been detected here
-    if((2*err < err_end || isnan(err) || isnan(err_end)) && !bLarge) //bGN)
+    if (isnan(err) || isnan(err_end) || (bInterrupted && err_end > err) || (!bInterrupted && 2*err < err_end && !bLarge)) //bGN)
     {
-        cout << "FAIL LOCAL-INERTIAL BA!!!!" << endl;
+        if (!bInterrupted)
+            cout << "FAIL LOCAL-INERTIAL BA!!!!" << endl;
         return;
     }
 
 
 
-    if(!vToErase.empty())
+    // Do not erase visual observations on early interrupt when LM may not have converged yet
+    if(!vToErase.empty() && !bInterrupted)
     {
         for(size_t i=0;i<vToErase.size();i++)
         {
@@ -3448,11 +3460,11 @@ void Optimizer::InertialOptimization(Map *pMap, Eigen::Matrix3d &Rwg, double &sc
         optimizer.addVertex(VV);
 
         // Vertex of fixed biases
-        VertexGyroBias* VG = new VertexGyroBias(vpKFs.front());
+        VertexGyroBias* VG = new VertexGyroBias(pKFi);
         VG->setId(2*(maxKFid+1)+(pKFi->mnId));
         VG->setFixed(true);
         optimizer.addVertex(VG);
-        VertexAccBias* VA = new VertexAccBias(vpKFs.front());
+        VertexAccBias* VA = new VertexAccBias(pKFi);
         VA->setId(3*(maxKFid+1)+(pKFi->mnId));
         VA->setFixed(true);
         optimizer.addVertex(VA);
@@ -3478,6 +3490,10 @@ void Optimizer::InertialOptimization(Map *pMap, Eigen::Matrix3d &Rwg, double &sc
         {
             if(pKFi->isBad() || pKFi->mPrevKF->mnId>maxKFid)
                 continue;
+            if(!pKFi->mpImuPreintegrated)
+                continue;
+
+            pKFi->mpImuPreintegrated->SetNewBias(pKFi->mPrevKF->GetImuBias());
                 
             g2o::HyperGraph::Vertex* VP1 = optimizer.vertex(pKFi->mPrevKF->mnId);
             g2o::HyperGraph::Vertex* VV1 = optimizer.vertex((maxKFid+1)+pKFi->mPrevKF->mnId);

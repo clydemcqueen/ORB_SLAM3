@@ -9,10 +9,19 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
+#include <sstream>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "System.h"
+
+#ifndef TEST_NAME
+#define TEST_NAME MonoEvaluationTest
+#endif
+
+#define MAKE_MONO_TEST_IMPL(suite, name) TEST(suite, name)
+#define MAKE_MONO_TEST(suite, name) MAKE_MONO_TEST_IMPL(suite, name)
 
 namespace fs = std::filesystem;
 
@@ -31,27 +40,29 @@ const std::string SETTINGS_FILE = SETTINGS_PATH;
 const std::string IMAGES_DIR = IMAGES_PATH;
 const std::string BASELINE_FILE = BASELINE_PATH;
 
-// NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
 void loadImages(const std::string& dir_path, std::vector<std::string>& image_files,
                 std::vector<double>& timestamps) {
+    std::vector<std::pair<double, std::string>> entries;
     for (const auto& entry : fs::directory_iterator(dir_path)) {
         if (entry.path().extension() == ".png") {
-            image_files.push_back(entry.path().string());
+            const std::string path_str = entry.path().string();
+            const double timestamp = std::stod(entry.path().stem().string()) / 1e9;
+            entries.emplace_back(timestamp, path_str);
         }
     }
-    // Sort to ensure sequential processing
-    std::sort(image_files.begin(), image_files.end());
+    // Sort numerically by timestamp to ensure sequential processing
+    std::sort(entries.begin(), entries.end());
 
-    for (const std::string& file : image_files) {
-        fs::path p(file);
-        std::string filename = p.stem().string();
-        double timestamp = std::stod(filename) / 1e9;  // nanoseconds to seconds
+    image_files.reserve(entries.size());
+    timestamps.reserve(entries.size());
+    for (const auto& [timestamp, file] : entries) {
+        image_files.push_back(file);
         timestamps.push_back(timestamp);
     }
 }
 }  // namespace
 
-TEST(ORBSLAM3, MonoEvaluationTest) {
+MAKE_MONO_TEST(ORBSLAM3, TEST_NAME) {
     std::vector<std::string> image_files;
     std::vector<double> timestamps;
     loadImages(IMAGES_DIR, image_files, timestamps);
@@ -70,9 +81,9 @@ TEST(ORBSLAM3, MonoEvaluationTest) {
         // Read header
         std::getline(f, line);
         while (std::getline(f, line)) {
-            FrameResult r;
+            FrameResult r{};
             // timestamp,tracking_state,num_features,num_inliers,tx,ty,tz,qx,qy,qz,qw
-            char comma;
+            char comma = ',';
             std::stringstream ss(line);
             ss >> r.timestamp >> comma >> r.tracking_state >> comma >> r.num_features >> comma >>
                 r.num_inliers >> comma >> r.tx >> comma >> r.ty >> comma >> r.tz >> comma >> r.qx >>
