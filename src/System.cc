@@ -215,6 +215,15 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
     mpTracker->SetTimeRecentlyLost(time_recently_lost);
     cout << "Stay in RECENTLY_LOST for " << time_recently_lost << " seconds" << endl;
 
+    float th_post_viba2 = 2.0f;
+    if (settings_) {
+        th_post_viba2 = settings_->thPostVIBA2();
+    } else if (!fsSettings["System.thPostVIBA2"].empty()) {
+        th_post_viba2 = static_cast<float>(fsSettings["System.thPostVIBA2"]);
+    }
+    mpTracker->SetThPostVIBA2(th_post_viba2);
+    cout << "Post-VIBA2 local map search radius factor: " << th_post_viba2 << endl;
+
     //Initialize the Loop Closing thread and launch
     // mSensor!=MONOCULAR && mSensor!=IMU_MONOCULAR
     mpLoopCloser = new LoopClosing(mpAtlas, mpKeyFrameDatabase, mpVocabulary, mSensor!=MONOCULAR, activeLC); // mSensor!=MONOCULAR);

@@ -486,6 +486,17 @@ namespace ORB_SLAM3 {
             // Existing default
             timeRecentlyLost_ = 5.0;
         }
+
+        cv::FileNode thPostVIBA2Node = fSettings["System.thPostVIBA2"];
+        if (thPostVIBA2Node.empty()) {
+            std::cerr << "System.thPostVIBA2 optional parameter does not exist..." << std::endl;
+            thPostVIBA2_ = 2.0f;
+        } else if (thPostVIBA2Node.isReal() || thPostVIBA2Node.isInt()) {
+            thPostVIBA2_ = static_cast<float>(thPostVIBA2Node);
+        } else {
+            std::cerr << "System.thPostVIBA2 parameter must be a number, aborting..." << std::endl;
+            exit(-1);
+        }
     }
 
     void Settings::precomputeRectificationMaps() {

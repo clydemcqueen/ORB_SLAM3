@@ -197,6 +197,9 @@ public:
     float GetTimeRecentlyLost() const { return time_recently_lost; }
     void SetTimeRecentlyLost(float time_recently_lost_) { time_recently_lost = time_recently_lost_; }
 
+    float GetThPostVIBA2() const { return th_post_viba2; }
+    void SetThPostVIBA2(float th_post_viba2_) { th_post_viba2 = th_post_viba2_; }
+
     cv::Mat DrawFrame() const;
 
 protected:
@@ -328,6 +331,7 @@ protected:
     unsigned int mnLastRelocFrameId;
     double mTimeStampLost;
     double time_recently_lost;
+    float th_post_viba2{2.0f};
 
     unsigned int mnFirstFrameId;
     unsigned int mnInitialFrameId;

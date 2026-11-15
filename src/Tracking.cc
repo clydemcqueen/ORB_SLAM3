@@ -3389,27 +3389,27 @@ void Tracking::SearchLocalPoints()
     if(nToMatch>0)
     {
         ORBmatcher matcher(0.8);
-        int th = 1;
+        float th = 1.0f;
         if(mSensor==System::RGBD || mSensor==System::IMU_RGBD)
-            th=3;
+            th=3.0f;
         if(mpAtlas->isImuInitialized())
         {
             if(mpAtlas->GetCurrentMap()->GetIniertialBA2())
-                th=2;
+                th=th_post_viba2;
             else
-                th=6;
+                th=6.0f;
         }
         else if(!mpAtlas->isImuInitialized() && (mSensor==System::IMU_MONOCULAR || mSensor==System::IMU_STEREO || mSensor == System::IMU_RGBD))
         {
-            th=10;
+            th=10.0f;
         }
 
         // If the camera has been relocalised recently, perform a coarser search
         if(mCurrentFrame.mnId<mnLastRelocFrameId+2)
-            th=5;
+            th=5.0f;
 
         if(mState==LOST || mState==RECENTLY_LOST) // Lost for less than 1 second
-            th=15; // 15
+            th=15.0f; // 15
 
         int matches = matcher.SearchByProjection(mCurrentFrame, mvpLocalMapPoints, th, mpLocalMapper->mbFarPoints, mpLocalMapper->mThFarPoints);
     }

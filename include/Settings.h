@@ -117,6 +117,7 @@ namespace ORB_SLAM3 {
 
         float thFarPoints() {return thFarPoints_;}
         float timeRecentlyLost() {return timeRecentlyLost_;}
+        float thPostVIBA2() {return thPostVIBA2_;}
 
         cv::Mat M1l() {return M1l_;}
         cv::Mat M2l() {return M2l_;}
@@ -229,6 +230,7 @@ namespace ORB_SLAM3 {
          */
         float thFarPoints_;
         float timeRecentlyLost_;  // Timeout in seconds before creating a new map after tracking is lost
+        float thPostVIBA2_;       // Local map SearchByProjection radius multiplier after VIBA2
     };
 };
 
